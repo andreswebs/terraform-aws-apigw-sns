@@ -1,3 +1,7 @@
+# terraform-aws-apigw-sqs
+
+Create an API Gateway endpoint that publishes to an SNS topic.
+
 [//]: # (BEGIN_TF_DOCS)
 
 
@@ -87,3 +91,11 @@ No modules.
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
 
 [//]: # (END_TF_DOCS)
+
+## Authors
+
+**Andre Silva** - [@andreswebs](https://github.com/andreswebs)
+
+## License
+
+This project is licensed under the [Unlicense](UNLICENSE.md).
