@@ -1,0 +1,72 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "${api_title}"
+  },
+  "servers": [
+    {
+      "variables": {
+        "basePath": {
+          "default": "${base_path}"
+        }
+      }
+    }
+  ],
+  "x-amazon-apigateway-api-key-source": "HEADER",
+  "paths": {
+    "/${api_path}": {
+      "post": {
+        "security": [
+          {
+            "api-key": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "x-amazon-apigateway-integration": {
+          "type": "aws",
+          "credentials": "${apigateway_integration_role_arn}",
+          "httpMethod": "POST",
+          "uri": "${apigateway_integration_uri}",
+          "responses": {
+            "default": {
+              "statusCode": "200"
+            }
+          },
+          "requestParameters": {
+            "integration.request.header.Content-Type": "'application/x-www-form-urlencoded'"
+          },
+          "requestTemplates": {
+            "application/json": "Action=Publish&TopicArn=$util.urlEncode('${topic_arn}')&Message=$util.urlEncode($input.body)"
+          },
+          "passthroughBehavior": "never"
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "api-key": {
+        "type": "apiKey",
+        "name": "x-api-key",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "Empty": {
+        "title": "Empty Schema",
+        "type": "object"
+      }
+    }
+  }
+}
