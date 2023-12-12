@@ -1,5 +1,5 @@
 module "apigw_sns" {
-  source                     = ""
+  source                     = "github.com/andreswebs/terraform-aws-apigw-sns"
   api_name                   = "example-notifications"
   api_title                  = "example-notifications"
   topic_name                 = "example-notifications"
