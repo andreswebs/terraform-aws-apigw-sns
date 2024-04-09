@@ -14,13 +14,15 @@
   ],
   "x-amazon-apigateway-api-key-source": "HEADER",
   "paths": {
-    "/${api_path}": {
+    "${api_path}": {
       "post": {
+        %{~ if api_key_enabled ~}
         "security": [
           {
             "api-key": []
           }
         ],
+        %{~ endif ~}
         "responses": {
           "200": {
             "description": "Success response",
@@ -56,11 +58,13 @@
   },
   "components": {
     "securitySchemes": {
+      %{~ if api_key_enabled ~}
       "api-key": {
         "type": "apiKey",
         "name": "x-api-key",
         "in": "header"
       }
+      %{~ endif ~}
     },
     "schemas": {
       "Empty": {

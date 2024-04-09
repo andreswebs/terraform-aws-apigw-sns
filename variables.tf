@@ -13,7 +13,11 @@ variable "api_title" {
 variable "api_path" {
   type        = string
   description = "(optional) The API path"
-  default     = ""
+  default     = "/"
+  validation {
+    condition     = startswith(var.api_path, "/")
+    error_message = "api_path must start with a /"
+  }
 }
 
 variable "api_stage_name" {
@@ -56,4 +60,10 @@ variable "ssm_parameter_name_url" {
   type        = string
   description = "The name of the SSM parameter to store the webhook URL"
   default     = "/webhook/url"
+}
+
+variable "api_key_enabled" {
+  type        = bool
+  description = "Whether to enable API key"
+  default     = true
 }

@@ -32,24 +32,13 @@ output "test_cmd" {
   description = "Commands to test the integration"
   value = {
 
-    invoke = <<-CMD
-      API_KEY=$(
-        aws ssm get-parameter \
-            --name ${aws_ssm_parameter.api_key.name} \
-            --with-decryption \
-            --query 'Parameter.Value' \
-            --output text | tr -d '[:space:]'
-      )
-      INVOKE_URL="${aws_api_gateway_stage.this.invoke_url}"
-      curl \
-          --location \
-          --header 'Content-Type: application/json' \
-          --header "X-Api-Key: $API_KEY" \
-          --data-raw '{ "TestMessage": "Hello From ApiGateway!" }' \
-          --request POST \
-          "$INVOKE_URL/${var.api_path}"
-    CMD
-
+    invoke = templatefile("${path.module}/tpl/invoke.sh.tftpl", {
+      api_key_enabled    = var.api_key_enabled
+      api_key_param_name = var.api_key_enabled ? aws_ssm_parameter.api_key[0].name : null
+      api_path           = var.api_path
+      invoke_url         = aws_api_gateway_stage.this.invoke_url
+      test_message       = "Hello from ApiGateway!"
+    })
 
   }
 }

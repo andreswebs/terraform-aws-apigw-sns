@@ -48,6 +48,7 @@ locals {
     apigateway_integration_uri      = local.apigw_sns_integration_uri
     apigateway_integration_role_arn = aws_iam_role.apigw_service.arn
     topic_arn                       = aws_sns_topic.this.arn
+    api_key_enabled                 = var.api_key_enabled
   })
 }
 
@@ -134,7 +135,8 @@ resource "aws_api_gateway_method_settings" "this" {
 }
 
 resource "aws_api_gateway_usage_plan" "this" {
-  name = var.api_usage_plan_name
+  count = var.api_key_enabled ? 1 : 0
+  name  = var.api_usage_plan_name
 
   api_stages {
     api_id = aws_api_gateway_rest_api.this.id
@@ -143,23 +145,26 @@ resource "aws_api_gateway_usage_plan" "this" {
 }
 
 resource "aws_api_gateway_api_key" "this" {
-  name = var.api_key_name
+  count = var.api_key_enabled ? 1 : 0
+  name  = var.api_key_name
 }
 
 resource "aws_api_gateway_usage_plan_key" "this" {
-  usage_plan_id = aws_api_gateway_usage_plan.this.id
-  key_id        = aws_api_gateway_api_key.this.id
+  count         = var.api_key_enabled ? 1 : 0
+  usage_plan_id = aws_api_gateway_usage_plan.this[0].id
+  key_id        = aws_api_gateway_api_key.this[0].id
   key_type      = "API_KEY"
 }
 
 resource "aws_ssm_parameter" "api_key" {
+  count = var.api_key_enabled ? 1 : 0
   name  = var.ssm_parameter_name_api_key
   type  = "SecureString"
-  value = aws_api_gateway_api_key.this.value
+  value = aws_api_gateway_api_key.this[0].value
 }
 
 resource "aws_ssm_parameter" "url" {
   name  = var.ssm_parameter_name_url
   type  = "String"
-  value = "${aws_api_gateway_stage.this.invoke_url}/webhook"
+  value = "${aws_api_gateway_stage.this.invoke_url}${var.api_path}"
 }
